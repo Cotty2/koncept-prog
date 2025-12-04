@@ -1,59 +1,36 @@
-def exp_taylor(x, n_terms=20):
- 
-    SCALE = 10**6
-    
-    if x < 0:
-        result = exp_taylor(-x, n_terms)
-        return (SCALE * SCALE) // result  # 1/exp(x)
-    
-    result = SCALE  
-    term = SCALE    
-    
+import decimal
+import math
 
-    for i in range(1, n_terms):
-       
-        term = (term * x) // (i * SCALE)
+def my_sin(x):
+   
+    angle = decimal.Decimal(x)
+    decimal.getcontext().prec = 30
+
+    term = angle
+    result = term
+    angle2 = angle * angle
+    n = 1
+    prev=result
+
+    test=math.sin(x)
+    while n <= 60:
+        term = -term * angle2 / (decimal.Decimal(2 * n) * decimal.Decimal(2 * n + 1))
+        prev =result
         result += term
-        
-        if term == 0:
-            break
-    
-    return result
+        if float(result)==float(prev):
+            break;        
+        n += 1
+    print(x,n,"iterations")
+    return float(result)
 
-def exp_float_to_fixed(x, scale=10**6):
-    return int(x * scale)
+N = 199
+test_points = [2 * math.pi * i / N  for i in range(N)]
 
-def fixed_to_float(value, scale=10**6):
-
-    return value / scale
-
-
-if __name__ == "__main__":
-
-    SCALE = 10**6
-    
-    test_values = [0, 1, 2, -1]
-    
-    for x_float in test_values:
-        x_fixed = exp_float_to_fixed(x_float, SCALE)
-        
-        # Вычисляем экспоненту
-        result_fixed = exp_taylor(x_fixed)
-        result_float = fixed_to_float(result_fixed, SCALE)
-        
-        # Сравниваем с математической библиотекой
-        import math
-        expected = math.exp(x_float)
-        
-
-
-    
-    x_fixed = exp_float_to_fixed(1, SCALE)
-    
-    for n_terms in [20]:
-        result_fixed = exp_taylor(x_fixed, n_terms)
-        result_float = fixed_to_float(result_fixed, SCALE)
-        expected = math.exp(1)
-        
-        print(f"Членов ряда: {n_terms:2d} -> {result_float:.8f} "
-              f"(погрешность: {abs(result_float - expected):.8f})")
+mismatches = 0
+for x in test_points:
+    a = my_sin(x)
+    b = math.sin(x)
+    if a != b:
+        mismatches += 1
+        print(f" my_sin = {a} | diff = {abs(a - b)}")
+print(f"Несовпадений: {mismatches}")
